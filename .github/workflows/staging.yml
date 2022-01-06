@@ -64,7 +64,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build
-          path: web/assets
+          path: |
+            web/mix-manifest.json
+            web/assets
           retention-days: 1
 
       - name: Update GitHub deployment status (failure)
@@ -104,7 +106,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build
-          path: web/assets
+          path: web/
 
       - name: Meta update
         run: |
