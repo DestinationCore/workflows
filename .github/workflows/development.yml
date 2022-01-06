@@ -42,14 +42,14 @@ jobs:
     outputs:
       deployment_id: ${{ steps.deployment.outputs.deployment_id }}
     steps:
-#      - name: Set GitHub deployment status
-#        uses: chrnorm/deployment-action@releases/v1
-#        id: deployment
-#        with:
-#          environment: Development
-#          initial_status: "pending"
-#          target_url: ${{ inputs.url }}
-#          token: "${{ github.token }}"
+      - name: Set GitHub deployment status
+        uses: chrnorm/deployment-action@releases/v1
+        id: deployment
+        with:
+          environment: Development
+          initial_status: "pending"
+          target_url: ${{ inputs.url }}
+          token: "${{ github.token }}"
 
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -67,14 +67,14 @@ jobs:
           path: web/assets
           retention-days: 1
 
-#      - name: Update GitHub deployment status (failure)
-#        if: failure()
-#        uses: chrnorm/deployment-status@releases/v1
-#        with:
-#          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-#          target_url: ${{ inputs.url }}
-#          state: "failure"
-#          token: "${{ github.token }}"
+      - name: Update GitHub deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@releases/v1
+        with:
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          target_url: ${{ inputs.url }}
+          state: "failure"
+          token: "${{ github.token }}"
 
   deploy:
     runs-on: self-hosted
@@ -123,20 +123,20 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
           dep deploy development --no-interaction
 
-#      - name: Update GitHub deployment status (success)
-#        if: success()
-#        uses: chrnorm/deployment-status@releases/v1
-#        with:
-#          deployment_id: ${{ needs.build.outputs.deployment_id }}
-#          target_url: ${{ inputs.url }}
-#          state: "success"
-#          token: "${{ github.token }}"
-#
-#      - name: Update GitHub deployment status (failure)
-#        if: failure()
-#        uses: chrnorm/deployment-status@releases/v1
-#        with:
-#          deployment_id: ${{ needs.build.outputs.deployment_id }}
-#          target_url: ${{ inputs.url }}
-#          state: "failure"
-#          token: "${{ github.token }}"
+      - name: Update GitHub deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@releases/v1
+        with:
+          deployment_id: ${{ needs.build.outputs.deployment_id }}
+          target_url: ${{ inputs.url }}
+          state: "success"
+          token: "${{ github.token }}"
+
+      - name: Update GitHub deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@releases/v1
+        with:
+          deployment_id: ${{ needs.build.outputs.deployment_id }}
+          target_url: ${{ inputs.url }}
+          state: "failure"
+          token: "${{ github.token }}"
