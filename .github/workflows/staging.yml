@@ -1,0 +1,142 @@
+name: Staging
+
+on:
+  workflow_call:
+    inputs:
+      aws_region:
+        required: true
+        type: string
+      deploy_target_tag:
+        required: true
+        type: string
+      deployer_config_branch:
+        required: true
+        type: string
+      deployer_config_repo:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+      php_version:
+        required: true
+        type: string
+      url:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      GITHUB_PAT:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    container:
+      image: ${{ inputs.image }}
+    outputs:
+      deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+    steps:
+      - name: Set GitHub deployment status
+        uses: chrnorm/deployment-action@releases/v1
+        id: deployment
+        with:
+          environment: Development
+          initial_status: "pending"
+          target_url: ${{ inputs.url }}
+          token: "${{ github.token }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install NPM packages
+        run: npm ci
+
+      - name: Run NPM build script
+        run: npm run production
+
+      - name: Upload built artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: web/assets
+          retention-days: 1
+
+      - name: Update GitHub deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@releases/v1
+        with:
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          target_url: ${{ inputs.url }}
+          state: "failure"
+          token: "${{ github.token }}"
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ inputs.aws_region }}
+      DEPLOY_TARGET_TAG: ${{ inputs.deploy_target_tag }}
+      PHP_VERSION: ${{ inputs.php_version }}
+    container:
+      image: ${{ inputs.image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download and merge Deployer configuration repository
+        run: |
+          eval `ssh-agent -s`
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
+          git clone ${{ inputs.deployer_config_repo }} --single-branch --branch ${{ inputs.deployer_config_branch }} ./deployer-temp
+          rm -r deployer-temp/.git deployer-temp/.gitignore
+          mv deployer-temp/* ./
+          rm -r deployer-temp
+
+      - name: Download built artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: web/assets
+
+      - name: Meta update
+        run: |
+          eval `ssh-agent -s`
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
+          meta git update
+
+      - name: Install Composer dependencies
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_PAT }}"} }'
+        run: composer install -q --no-ansi --no-interaction --no-scripts --prefer-dist --no-dev
+
+      - name: Deploy to development
+        run: |
+          eval `ssh-agent -s`
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
+          dep deploy staging --no-interaction
+
+      - name: Update GitHub deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@releases/v1
+        with:
+          deployment_id: ${{ needs.build.outputs.deployment_id }}
+          target_url: ${{ inputs.url }}
+          state: "success"
+          token: "${{ github.token }}"
+
+      - name: Update GitHub deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@releases/v1
+        with:
+          deployment_id: ${{ needs.build.outputs.deployment_id }}
+          target_url: ${{ inputs.url }}
+          state: "failure"
+          token: "${{ github.token }}"
