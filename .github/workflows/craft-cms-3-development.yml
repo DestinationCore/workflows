@@ -9,6 +9,9 @@ on:
       deploy_target_tag:
         required: true
         type: string
+      deployer_config_branch:
+        required: true
+        type: string
       deployer_config_repo:
         required: true
         type: string
