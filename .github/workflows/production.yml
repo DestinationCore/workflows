@@ -21,7 +21,7 @@ on:
       php_version:
         required: true
         type: string
-      url:
+      domain:
         required: true
         type: string
     secrets:
@@ -48,7 +48,7 @@ jobs:
         with:
           environment: Development
           initial_status: "pending"
-          target_url: ${{ inputs.url }}
+          target_url: "https://${{ inputs.domain }}"
           token: "${{ github.token }}"
 
       - name: Checkout repository
@@ -74,7 +74,7 @@ jobs:
         uses: chrnorm/deployment-status@releases/v1
         with:
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          target_url: ${{ inputs.url }}
+          target_url: "https://${{ inputs.domain }}"
           state: "failure"
           token: "${{ github.token }}"
 
@@ -87,6 +87,7 @@ jobs:
       AWS_REGION: ${{ inputs.aws_region }}
       DEPLOY_TARGET_TAG: ${{ inputs.deploy_target_tag }}
       PHP_VERSION: ${{ inputs.php_version }}
+      DOMAIN: ${{ inputs.domain }}
     container:
       image: ${{ inputs.image }}
     steps:
@@ -130,7 +131,7 @@ jobs:
         uses: chrnorm/deployment-status@releases/v1
         with:
           deployment_id: ${{ needs.build.outputs.deployment_id }}
-          target_url: ${{ inputs.url }}
+          target_url: "https://${{ inputs.domain }}"
           state: "success"
           token: "${{ github.token }}"
 
@@ -139,6 +140,6 @@ jobs:
         uses: chrnorm/deployment-status@releases/v1
         with:
           deployment_id: ${{ needs.build.outputs.deployment_id }}
-          target_url: ${{ inputs.url }}
+          target_url: "https://${{ inputs.domain }}"
           state: "failure"
           token: "${{ github.token }}"
