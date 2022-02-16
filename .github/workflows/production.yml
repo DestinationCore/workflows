@@ -34,6 +34,14 @@ on:
       SSH_PRIVATE_KEY:
         required: true
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ inputs.aws_region }}
+  DEPLOY_TARGET_TAG: ${{ inputs.deploy_target_tag }}
+  PHP_VERSION: ${{ inputs.php_version }}
+  DOMAIN: ${{ inputs.domain }}
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -93,13 +101,6 @@ jobs:
   deploy:
     runs-on: self-hosted
     needs: build
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ inputs.aws_region }}
-      DEPLOY_TARGET_TAG: ${{ inputs.deploy_target_tag }}
-      PHP_VERSION: ${{ inputs.php_version }}
-      DOMAIN: ${{ inputs.domain }}
     container:
       image: ${{ inputs.image }}
     steps:
