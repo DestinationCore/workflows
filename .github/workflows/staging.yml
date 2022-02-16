@@ -54,6 +54,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Download and merge Deployer configuration repository
+        run: |
+          eval `ssh-agent -s`
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
+          git clone ${{ inputs.deployer_config_repo }} --single-branch --branch ${{ inputs.deployer_config_branch }} ./deployer-temp
+          rm -r deployer-temp/.git deployer-temp/.gitignore
+          mv deployer-temp/* ./
+          rm -r deployer-temp
+
+      - name: Download environment file via Deployer
+        run: dep aws:download-env-file staging --no-interaction
+
       - name: Install NPM packages
         run: npm ci
 

@@ -74,10 +74,7 @@ jobs:
           rm -r deployer-temp
 
       - name: Download environment file via Deployer
-        run: |
-          eval `ssh-agent -s`
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
-          dep aws:download-env-file review --no-interaction
+        run: dep aws:download-env-file review --no-interaction
 
       - name: Install NPM packages
         run: npm ci
