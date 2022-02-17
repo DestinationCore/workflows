@@ -133,7 +133,7 @@ jobs:
           COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_PAT }}"} }'
         run: composer install -q --no-ansi --no-interaction --no-scripts --prefer-dist --no-dev
 
-      - name: Deploy to development
+      - name: Deploy to production
         run: |
           eval `ssh-agent -s`
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
