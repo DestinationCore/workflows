@@ -41,7 +41,9 @@ env:
 
 jobs:
   destroy:
-    if: github.event.ref_type == 'branch'
+    if: |
+      github.event.ref_type == 'branch' && 
+      (startsWith(github.event.ref, 'review/') || startsWith(github.event.ref, 'feature/'))
     runs-on: self-hosted
     container:
       image: ${{ inputs.image }}
