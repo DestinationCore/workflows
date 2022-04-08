@@ -79,6 +79,10 @@ jobs:
           org_name: "@destinationcore"
           auth_token: "${{ github.token }}"
           always_auth: true
+          
+      - name: Echo .npmrc
+        run: |
+          echo .npmrc
 
       - name: Install NPM packages
         run: npm ci
