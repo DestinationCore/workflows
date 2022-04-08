@@ -80,9 +80,9 @@ jobs:
           auth_token: "${{ github.token }}"
           always_auth: true
           
-      - name: Echo .npmrc
+      - name: Output .npmrc
         run: |
-          echo .npmrc
+          cat .npmrc
 
       - name: Install NPM packages
         run: npm ci
