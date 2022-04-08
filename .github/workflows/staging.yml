@@ -76,7 +76,7 @@ jobs:
       - name: Create .npmrc
         uses: bikutadesu/create-npmrc@v1.0.0
         with:
-          org_name: "@destinationcore"
+          org_name: "destinationcore"
           auth_token: "${{ github.token }}"
           always_auth: true
           
