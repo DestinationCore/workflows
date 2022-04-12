@@ -1,5 +1,8 @@
 name: Staging
 
+permissions:
+  packages: read
+
 on:
   workflow_call:
     inputs:
@@ -79,10 +82,6 @@ jobs:
           org_name: "destinationcore"
           auth_token: "${{ github.token }}"
           always_auth: true
-          
-      - name: Output .npmrc
-        run: |
-          cat .npmrc
 
       - name: Install NPM packages
         run: npm ci
