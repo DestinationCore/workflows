@@ -1,7 +1,10 @@
 name: Staging
-
+  
 permissions:
+  checks: write
+  deployments: write
   packages: read
+  statuses: write
 
 on:
   workflow_call:
