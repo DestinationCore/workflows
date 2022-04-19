@@ -74,6 +74,13 @@ jobs:
       - name: Download environment file via Deployer
         run: dep aws:download-env-file production --no-interaction
 
+      - name: Create .npmrc
+        uses: bikutadesu/create-npmrc@v1.0.0
+        with:
+          org_name: "destinationcore"
+          auth_token: "${{ secrets.GITHUB_PAT }}"
+          always_auth: true
+
       - name: Install NPM packages
         run: npm ci
 
