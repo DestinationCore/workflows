@@ -68,9 +68,3 @@ jobs:
           eval `ssh-agent -s`
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
           dep review:destroy review --no-interaction
-
-      - name: Delete environment
-        uses: strumwolf/delete-deployment-environment@v2
-        with:
-          token: ${{ github.token }}
-          environment: "Review: ${{ env.REVIEW_NAME }}"

@@ -46,20 +46,9 @@ jobs:
     runs-on: ubuntu-20.04
     container:
       image: ${{ inputs.image }}
-    outputs:
-      deployment_id: ${{ steps.deployment.outputs.deployment_id }}
     steps:
       - name: Get review name
         run: echo "REVIEW_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
-
-      - name: Set GitHub deployment status
-        uses: chrnorm/deployment-action@releases/v1
-        id: deployment
-        with:
-          environment: "Review: ${{ env.REVIEW_NAME }}"
-          initial_status: "pending"
-          target_url: "https://${{ github.event.repository.name }}_${{ env.REVIEW_NAME }}.${{ inputs.url_suffix }}/"
-          token: "${{ github.token }}"
 
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -100,15 +89,6 @@ jobs:
             web/mix-manifest.json
             web/assets
           retention-days: 1
-
-      - name: Update GitHub deployment status (failure)
-        if: failure()
-        uses: chrnorm/deployment-status@releases/v1
-        with:
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          target_url: "https://${{ github.event.repository.name }}_${{ env.REVIEW_NAME }}.${{ inputs.url_suffix }}/"
-          state: "failure"
-          token: "${{ github.token }}"
 
   deploy:
     runs-on: self-hosted
@@ -153,21 +133,3 @@ jobs:
           eval `ssh-agent -s`
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
           dep deploy review --no-interaction
-
-      - name: Update GitHub deployment status (success)
-        if: success()
-        uses: chrnorm/deployment-status@releases/v1
-        with:
-          deployment_id: ${{ needs.build.outputs.deployment_id }}
-          target_url: "https://${{ github.event.repository.name }}_${{ env.REVIEW_NAME }}.${{ inputs.url_suffix }}/"
-          state: "success"
-          token: "${{ github.token }}"
-
-      - name: Update GitHub deployment status (failure)
-        if: failure()
-        uses: chrnorm/deployment-status@releases/v1
-        with:
-          deployment_id: ${{ needs.build.outputs.deployment_id }}
-          target_url: "https://${{ github.event.repository.name }}_${{ env.REVIEW_NAME }}.${{ inputs.url_suffix }}/"
-          state: "failure"
-          token: "${{ github.token }}"
