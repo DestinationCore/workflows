@@ -60,7 +60,7 @@ jobs:
           rm -r deployer-temp
 
       - name: Download environment file via Deployer
-        run: /root/.composer/vendor/bin/dep aws:download-env-file staging --no-interaction
+        run: /root/.composer/vendor/bin/dep aws:download-env-file stage=staging --no-interaction
 
       - name: Create .npmrc
         uses: bikutadesu/create-npmrc@v1.0.0
@@ -123,4 +123,4 @@ jobs:
         run: |
           eval `ssh-agent -s`
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
-          /root/.composer/vendor/bin/dep deploy staging --no-interaction
+          /root/.composer/vendor/bin/dep deploy stage=staging --no-interaction
