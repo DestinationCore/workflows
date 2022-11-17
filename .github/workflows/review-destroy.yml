@@ -62,6 +62,9 @@ jobs:
           rm -r deployer-temp/.git deployer-temp/.gitignore
           mv deployer-temp/* ./
           rm -r deployer-temp
+          
+      - name: Download environment file via Deployer
+        run: dep aws:download-env-file review --no-interaction
 
       - name: Destroy deployment
         run: |
