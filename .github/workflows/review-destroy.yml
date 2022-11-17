@@ -52,7 +52,7 @@ jobs:
         run: echo "REVIEW_NAME=${GITHUB_REF_OVERRIDE##*/}" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download and merge Deployer configuration repository
         run: |
