@@ -15,10 +15,6 @@ on:
       deployer_config_repo:
         required: true
         type: string
-      detect_multisite:
-        required: false
-        type: boolean
-        default: true
       image:
         required: true
         type: string
@@ -42,7 +38,6 @@ env:
   DEPLOY_TARGET_TAG: ${{ inputs.deploy_target_tag }}
   PHP_VERSION: ${{ inputs.php_version }}
   GITHUB_REF_OVERRIDE: ${{ github.event.ref }}
-  DETECT_MULTISITE: ${{ inputs.detect_multisite }}
 
 jobs:
   destroy:
