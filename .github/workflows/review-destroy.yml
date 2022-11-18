@@ -64,10 +64,10 @@ jobs:
           rm -r deployer-temp
           
       - name: Download environment file via Deployer
-        run: dep aws:download-env-file review --no-interaction
+        run: /root/.composer/vendor/bin/dep aws:download-env-file stage=review --no-interaction
 
       - name: Destroy deployment
         run: |
           eval `ssh-agent -s`
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add - > /dev/null
-          dep review:destroy review --no-interaction
+          /root/.composer/vendor/bin/dep review:destroy stage=review --no-interaction
