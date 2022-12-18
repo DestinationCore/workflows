@@ -61,7 +61,7 @@ jobs:
           rm -r deployer-temp
 
       - name: Download environment file via Deployer
-        run:  /root/.composer/vendor/bin/dep aws:download-env-file stage=production --no-interaction
+        run: /root/.composer/vendor/bin/dep aws:download-env-file stage=production --no-interaction
 
       - name: Create .npmrc
         uses: bikutadesu/create-npmrc@v1.0.0
