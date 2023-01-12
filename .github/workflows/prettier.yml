@@ -1,0 +1,37 @@
+name: Prettier
+
+on:
+  workflow_call:
+    inputs:
+      org_name:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+    secrets:
+      auth_token:
+        required: true
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-22.04
+    container:
+      image: ${{ inputs.image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create .npmrc
+        uses: bikutadesu/create-npmrc@v1.0.0
+        with:
+          org_name: ${{ inputs.org_name }}
+          auth_token: ${{ secrets.auth_token }}
+          always_auth: true
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Prettier
+        run: npm run check
