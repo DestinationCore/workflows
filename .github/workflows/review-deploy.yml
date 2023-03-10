@@ -95,6 +95,7 @@ jobs:
     needs: build
     container:
       image: ${{ inputs.image }}
+    concurrency: review-deploy-${{ github.ref }}
     steps:
       - name: Get review name
         run: echo "REVIEW_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV

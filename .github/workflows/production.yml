@@ -90,6 +90,7 @@ jobs:
     needs: build
     container:
       image: ${{ inputs.image }}
+    concurrency: production-${{ github.ref }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
