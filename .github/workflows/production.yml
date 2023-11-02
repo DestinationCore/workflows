@@ -33,8 +33,6 @@ on:
         required: true
       SSH_PRIVATE_KEY:
         required: true
-      SLACK_WEBHOOK:
-        required: false
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -43,7 +41,6 @@ env:
   DEPLOY_TARGET_TAG: ${{ inputs.deploy_target_tag }}
   PHP_VERSION: ${{ inputs.php_version }}
   DOMAIN: ${{ inputs.domain }}
-  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
 jobs:
   build:
